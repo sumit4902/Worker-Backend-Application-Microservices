@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worker.Payload.ApiResponse;
 import com.worker.Payload.WorkerDto;
+import com.worker.Payload.WorkerResponse;
 import com.worker.Service.WorkerService;
 
 @RestController
@@ -48,10 +50,17 @@ public class WorkerController {
 	}
 	
 	@GetMapping("/worker/all")
-	ResponseEntity<List<WorkerDto>> getAllWorkers()
-	{
-		List<WorkerDto> allworker =  this.workerservice.GetAllWorker();
-		return new ResponseEntity<List<WorkerDto>>(allworker,HttpStatus.OK);
+	ResponseEntity<WorkerResponse> getAllWorkers(@RequestBody 
+			@RequestParam(name = "name",defaultValue = "",required = false) String name,
+	        @RequestParam(name = "address",defaultValue = "",required = false) String address,
+	        @RequestParam(name = "expertise",defaultValue = "",required = false) String expertise,
+	        @RequestParam(name = "pageNo",defaultValue ="0",required = false) int pageNo,
+	        @RequestParam(name = "pageSize",defaultValue ="20",required = false) int pageSize,
+	        @RequestParam(name = "sortBy",defaultValue = "workerId",required = false) String sortBy,
+	        @RequestParam(name = "direc",defaultValue = "desc",required = false) String direc)
+	  	{
+		WorkerResponse  allworker =  this.workerservice.GetAllWorker(name, address, expertise, pageNo, pageSize, sortBy, direc);
+		return new ResponseEntity<WorkerResponse>(allworker,HttpStatus.OK);
 		
 	}
 	@DeleteMapping("/worker/delete/{Id}")

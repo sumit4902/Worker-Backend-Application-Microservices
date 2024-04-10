@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import com.worker.Payload.WorkerDto;
+import com.worker.Payload.WorkerResponse;
 
 public interface WorkerService {
 
@@ -12,10 +13,18 @@ public interface WorkerService {
 	
 	WorkerDto updateWorker(WorkerDto workerdto ,long Id);
 	WorkerDto getById(long Id);
-	List<WorkerDto> GetAllWorker();
+	
 	void deleteWorker(long Id);
 	
-	//For microservice
+	
+	
+	// for filter
+    WorkerResponse GetAllWorker(String name,String address,String expertise,int PageNo,int pageSize,String sortBy,String direc);
+	
+    
+    
+    
+    //For microservice
 	WorkerDto getWorkerByUserId(long userId);
 	
 }

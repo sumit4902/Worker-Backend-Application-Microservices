@@ -3,6 +3,7 @@ package com.worker.Service;
 import java.util.List;
 
 import com.worker.Payload.TeamDto;
+import com.worker.Payload.TeamResponse;
 
 public interface TeamService {
 
@@ -10,6 +11,7 @@ public interface TeamService {
 	TeamDto getTeamByWorkerId(long workerId);
 	TeamDto updateTeam(TeamDto teamdto ,long Id);
 	TeamDto getById(long Id);
-	List<TeamDto> getAll();
+	
+	TeamResponse getAll(String leaderName,String address,String expertise,Integer pageNo,Integer pageSize,String sortBy,String direc);
 	void deleteWorker(long Id);
 }

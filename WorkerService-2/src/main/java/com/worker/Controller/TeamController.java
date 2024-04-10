@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worker.Payload.ApiResponse;
 import com.worker.Payload.TeamDto;
+import com.worker.Payload.TeamResponse;
 import com.worker.Service.TeamService;
 
 @RestController
@@ -55,10 +57,19 @@ public class TeamController {
 	}
 	
 	@GetMapping("/team/all")
-	ResponseEntity<List<TeamDto>> getAllTeam()
+	ResponseEntity<TeamResponse> getAllTeam(@RequestBody
+			    @RequestParam(name="leaderName",defaultValue="",required = false) String leaderName,
+			    @RequestParam(name = "address",defaultValue ="",required = false)String address,
+	            @RequestParam(name = "expertise",defaultValue = "",required = false )String expertise,
+	
+			    @RequestParam(name ="pageNo" ,defaultValue = "0",required = false) int pageNo,
+			    @RequestParam(name="pageSize",defaultValue = "10",required = false ) int pageSize,
+			    @RequestParam(name ="sortBy",defaultValue = "teamId" ,required = false) String sortBy,
+			    @RequestParam(name ="direc",defaultValue = "desc" ,required = false) String direc
+				)
 	{
-		List<TeamDto> allTeam = this.teamService.getAll();
-		return new ResponseEntity<List<TeamDto>>(allTeam,HttpStatus.OK);
+		TeamResponse allTeam = this.teamService.getAll(leaderName, address, expertise,pageNo,pageSize, sortBy, direc);
+		return new ResponseEntity<TeamResponse>(allTeam,HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/team/delete/{Id}")

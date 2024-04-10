@@ -6,10 +6,15 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.worker.Entities.Worker;
 import com.worker.Payload.WorkerDto;
+import com.worker.Payload.WorkerResponse;
 import com.worker.Repositories.WorkerRepo;
 import com.worker.Service.WorkerService;
 
@@ -22,6 +27,9 @@ public class WorkerServiceImpl implements WorkerService {
 	
 	@Autowired
 	private ModelMapper modelmapper;
+	
+	@Autowired
+   private WorkerResponse workerResponse;
 	
 	@Override
 	public WorkerDto createWorker(WorkerDto workerdto) {
@@ -53,10 +61,28 @@ public class WorkerServiceImpl implements WorkerService {
 	}
 
 	@Override
-	public List<WorkerDto> GetAllWorker() {
-		List<Worker> allworker = this.workerrepo.findAll();
-		List<WorkerDto> convertedwrker = allworker.stream().map((worker)-> this.modelmapper.map(worker,WorkerDto.class)).collect(Collectors.toList());
-		return convertedwrker;
+	public WorkerResponse GetAllWorker(String name,String address,String expertise,int PageNo,int pageSize,String sortBy,String direc) {
+		Pageable p;
+		if(direc.equalsIgnoreCase("desc"))
+		{
+			p= PageRequest.of(PageNo, pageSize, Sort.by(sortBy).descending());
+		}
+		else {
+			p = PageRequest.of(PageNo, pageSize, Sort.by(sortBy).ascending());
+		}
+	
+		Page<Worker> workerpages = this.workerrepo.findByNameContainingIgnoreCaseAndAddressContainingIgnoreCaseAndExpertiseContainingIgnoreCase(name, address, expertise, p);
+		
+		List<Worker> workers = workerpages.getContent();
+		List<WorkerDto> convertedwrker = workers.stream().map((worker)-> this.modelmapper.map(worker,WorkerDto.class)).collect(Collectors.toList());
+		
+		workerResponse.setContent(convertedwrker);
+		workerResponse.setPageNo(workerpages.getNumber());
+		workerResponse.setPageSize(workerpages.getSize());
+		workerResponse.setTotalElements(workerpages.getTotalElements());
+		workerResponse.setTotalPages(workerpages.getTotalPages());
+		workerResponse.setLastpage(workerpages.isLast());
+		return workerResponse;
 	}
 
 	@Override

@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.worker.Payload.TeamResponse;
+import com.worker.Payload.WorkerResponse;
+
 @SpringBootApplication
 @ComponentScan("com.worker")
 @EnableJpaRepositories("com.worker.Repositories")
@@ -24,5 +27,17 @@ public class WorkerService2Application {
 	ModelMapper modelmapper()
 	{
 		return new ModelMapper();
+	}
+	
+	@Bean
+	TeamResponse teamResponse()
+	{
+		return new TeamResponse();
+	}
+	
+	@Bean
+	WorkerResponse workerResponse()
+	{
+		return new WorkerResponse();
 	}
 }

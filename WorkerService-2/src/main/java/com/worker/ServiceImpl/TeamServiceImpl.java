@@ -1,16 +1,22 @@
 package com.worker.ServiceImpl;
 
+
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.worker.Entities.Team;
 import com.worker.Entities.Worker;
 import com.worker.Payload.TeamDto;
+import com.worker.Payload.TeamResponse;
 import com.worker.Repositories.TeamRepo;
 import com.worker.Repositories.WorkerRepo;
 import com.worker.Service.TeamService;
@@ -24,6 +30,9 @@ public class TeamServiceImpl implements TeamService {
 	private WorkerRepo workerRepo;
 	@Autowired
 	private ModelMapper modelmapper;
+	
+	@Autowired
+	private TeamResponse teamresponse;
 	
 	
 	@Override
@@ -75,10 +84,29 @@ public class TeamServiceImpl implements TeamService {
 	
 	
 	@Override
-	public List<TeamDto> getAll() {
-    List<Team> allteam=this.teamrepo.findAll();
-    List<TeamDto> convertedteam = allteam.stream().map((team)-> this.modelmapper.map(team, TeamDto.class)).collect(Collectors.toList());
-		return convertedteam;
+	public TeamResponse getAll(String leaderName,String address,String expertise,Integer pageNo,Integer pageSize,String sortBy,String direc) {
+		  Pageable p;
+		if(direc.equalsIgnoreCase("desc"))
+		{
+			   p =   PageRequest.of(pageNo, pageSize,Sort.by(sortBy).descending());
+		      
+		}
+		else {
+			  p =   PageRequest.of(pageNo, pageSize,Sort.by(sortBy).ascending());
+		      
+		}
+		  Page<Team> teampages = this.teamrepo.findByLeaderNameContainingIgnoreCaseAndAddressContainingIgnoreCaseAndExpertiseContainingIgnoreCase(leaderName,address, expertise, p);
+		 List<Team> teams  = teampages.getContent();
+     
+    List<TeamDto> convertedteam = teams.stream().map((team)-> this.modelmapper.map(team, TeamDto.class)).collect(Collectors.toList());
+		 teamresponse.setContent(convertedteam);
+		 teamresponse.setPageNo(teampages.getNumber());
+		 teamresponse.setPageSize(teampages.getSize());
+		 teamresponse.setTotalElements(teampages.getTotalElements());
+		 teamresponse.setTotalPages(teampages.getTotalPages());
+		 teamresponse.setLastpage(teampages.isLast());
+    
+       return teamresponse;
 	}
 	
 	
@@ -90,7 +118,6 @@ public class TeamServiceImpl implements TeamService {
 		
 	}
 
-	
 	
 	
 	
